@@ -18,7 +18,7 @@ def nvidia_architecture():
     
     drop_prob = 0.0
     # initializier = 'lecun_uniform'
-    initializier = 'glorot_uniform'
+    initializier = 'glorot_normal'
     
     height = 160
     width = 320
@@ -95,12 +95,12 @@ def  lenet_architecture():
 data_folder = 'mydata/'
 skip_first = True
 epochs = 20
-batch_size = 128
-use_lateral_images = False
-flip_dataset = False
+batch_size = 64
+use_lateral_images = True
+flip_dataset = True
 model_type = 'nvidia'
 learning_rate = 1e-03
-train_augmentation = 1 * (3 if use_lateral_images else 1) * (2 if flip_dataset else 1)
+train_augmentation = 1 * (3 if use_lateral_images else 1)
 
 
 ### Import and split data log
@@ -134,7 +134,7 @@ def generator(samples, batch_size=32, mode='train'):
                 # Read steering angle and compute adjusted steering measurements for the side camera images
                 
                 steering_center = float(batch_sample[3])
-                correction = 0.5 # tuning: 1.0 is the one showing the best results, I don't understand why 0.9 or 1.1 are already incredibly bad!
+                correction = 0.4
                 steering_left = steering_center + correction
                 steering_right = steering_center - correction
                 
@@ -153,12 +153,13 @@ def generator(samples, batch_size=32, mode='train'):
                     images_to_append = [img_center]
                     angles_to_append = [steering_center]
                 
-                # Add a flipped version of each image
-                if flip_dataset and (mode == 'train'):
+                # Flip some images
+                flipornot = bool(np.round(np.random.rand(1)))
+                if flip_dataset and flipornot and (mode == 'train'):
                     for image in images_to_append:
-                        images_to_append.append(cv2.flip(image, 1))
+                        image = cv2.flip(image, 1)
                     for angle in angles_to_append:
-                        angles_to_append.append(-1. * angle)
+                        angle = -1. * angle
                 
                 # Append the results to the output list
                 images.extend(images_to_append)
@@ -169,7 +170,7 @@ def generator(samples, batch_size=32, mode='train'):
             # Convert to numpy array and return
             X_train = np.array(images)
             y_train = np.array(angles)
-                        
+                                    
             yield sklearn.utils.shuffle(X_train, y_train)
 
 
@@ -189,15 +190,15 @@ model.compile(loss='mse',
               optimizer=optimizers.Adam(lr=learning_rate))
 """
 
-model.fit_generator(train_generator,
-                    samples_per_epoch= len(train_samples) * train_augmentation,
-                    validation_data=validation_generator,
-                    nb_val_samples=len(validation_samples),
-                    nb_epoch=epochs,
-                    verbose=1,
-                    callbacks=[early_stop, check_point])
+history = model.fit_generator(train_generator,
+                              samples_per_epoch=len(train_samples) * train_augmentation,
+                              validation_data=validation_generator,
+                              nb_val_samples=len(validation_samples),
+                              nb_epoch=epochs,
+                              verbose=1,
+                              callbacks=[early_stop, check_point])
 
-                    
+
 ### Saving
 model.save('model.h5')
 
@@ -211,6 +212,6 @@ ax.set_ylabel('mean squared error loss')
 ax.set_xlabel('epoch')
 ax.grid(True)
 plt.legend(['training set', 'validation set'], loc='upper right')
-figname = 'model_' + str(use_lateral_images) + '_' + str(flip_dataset) + '_' + model_type + '_' + str(epochs) + '_' + str(batch_size) + '.png'
+figname = 'model.png'
 f.savefig(figname, bbox_inches='tight')
 
