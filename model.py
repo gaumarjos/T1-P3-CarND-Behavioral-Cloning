@@ -14,9 +14,8 @@ from keras import optimizers
 
 def nvidia_architecture():
     # https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/
-    # I'm sure about kernel sizes and strides, not about the padding, it should be same for the first 3 layers
-    
-    drop_prob = 0.0
+        
+    drop_prob = 0.25
     # initializier = 'lecun_uniform'
     initializier = 'glorot_normal'
     
@@ -31,33 +30,31 @@ def nvidia_architecture():
     
     model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='valid', init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))
+    model.add(Dropout(drop_prob))
     
     model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode='valid', init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))  
+    model.add(Dropout(drop_prob))  
     
     model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='valid', init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))
+    model.add(Dropout(drop_prob))
     
     model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))
+    model.add(Dropout(drop_prob))
     
     model.add(Convolution2D(64, 3, 3, subsample=(1, 1), border_mode='valid', init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))
+    model.add(Dropout(drop_prob))
     
     model.add(Flatten())
     
     model.add(Dense(100, init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))
     
     model.add(Dense(50, init=initializier))
     model.add(ELU())
-    #model.add(Dropout(drop_prob))
     
     model.add(Dense(10, init=initializier))
     model.add(ELU())
@@ -67,7 +64,11 @@ def nvidia_architecture():
     return model
 
 
-def  lenet_architecture():
+def lenet_architecture():
+    height = 160
+    width = 320
+    channels = 3
+
     model = Sequential()
     
     model.add(Cropping2D(cropping=((65,20), (0,0)), input_shape=(height, width, channels)))
@@ -92,9 +93,9 @@ def  lenet_architecture():
 
 
 ### Parameters
-data_folder = 'mydata/'
-skip_first = True
-epochs = 20
+data_folder = 'data/'
+skip_first = False
+epochs = 10
 batch_size = 64
 use_lateral_images = True
 flip_dataset = True
@@ -179,7 +180,8 @@ train_generator = generator(train_samples, batch_size=batch_size, mode='train')
 validation_generator = generator(validation_samples, batch_size=batch_size, mode='valid')
 
 model = nvidia_architecture()
-        
+
+# Save model at every epoch instead of just at the end
 check_point = ModelCheckpoint('./checkpoints/model-e{epoch:03d}.h5', monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=False, mode='auto')
 early_stop = EarlyStopping(monitor='val_loss', patience=5, verbose=0, mode='min')
 
@@ -198,9 +200,7 @@ history = model.fit_generator(train_generator,
                               verbose=1,
                               callbacks=[early_stop, check_point])
 
-
-### Saving
-model.save('model.h5')
+# model.save('model.h5')
 
 
 ### Show some stats                    

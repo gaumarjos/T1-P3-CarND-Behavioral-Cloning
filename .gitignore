@@ -1,6 +1,7 @@
 linux_sim/*
 data/*
 mydata/*
-mydata2/*
+run/*
+without_dropout/*
 .ipynb_checkpoints/*
 
