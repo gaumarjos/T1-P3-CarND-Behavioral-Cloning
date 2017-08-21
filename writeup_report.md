@@ -47,9 +47,9 @@ The architecture used is the one described by Nvidia in their [End to End Learni
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting. Startng from the pool of data available, training and validation set has been splitted 80-20%. The model was then tested by running it through the simulator and ensuring that the vehicle could stay on track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting. Starting from the pool of data available, training and validation sets have been splitted 80-20%. The model was then tested by running it through the simulator and ensuring that the vehicle could stay on track.
 
-The model contains dropout layers, placed after the convolutional layers, to reduce overfitting.
+The model contains dropout layers to reduce overfitting.
 
 #### 3. Model parameter tuning
 
@@ -57,7 +57,7 @@ The model used an adam optimizer, with the default initial learning rate of 0.00
 
 #### 4. Appropriate training data
 
-I recorded training data by driving naturally at the centre of the road. I did not add recovery maneuvres from the left and right sides, specifically to see if it was possible to build a working model by just driving normally.
+I recorded training data by driving naturally at the centre of the road. I did not add recovery maneuvres from the left and right sides, specifically as I was curious to see if it was possible to build a working model by just driving normally.
 
 ### Model Architecture and Training Documentation
 
@@ -65,13 +65,13 @@ I recorded training data by driving naturally at the centre of the road. I did n
 
 The whole model was implemented in Keras.
 
-Before opting for the Nvidia network, I tried the LeNet architecture to see if it was powerful enough to solve the problem. I obtained decent results in terms of validation loss and the network could to drive the car smoothly, but was unable to react timely when the car was getting closer to the curb.
+Before opting for the Nvidia network, I tried the LeNet architecture to see if it was powerful enough to solve the problem. I obtained decent results in terms of validation loss and the network could to drive the car smoothly, but was unable to react timely when the car was getting closer to the curbs and the car ended up driving straight out of the narrower curves.
 
 After observing this, I decided to switch to a more complex architecture, the one proposed by Nvidia in their [paper](https://arxiv.org/pdf/1604.07316v1.pdf)
 
 Before stepping into the details of the architecure, it's worth mentioning that, as a first step, the images are cropped (so the NN could concetrate only on the road and forget about the landscape) and the data normalized. Both activities were performed using Keras modules.
 
-I tried different initializations methods for weights and biases, such as zeros, truncated normal, lecun uniform and glorot normal and, after observing the results, decided for the latter, that allowed the network to converge faster to smaller validation loss values.
+I tried different initializations methods for weights and biases, such as zeros, truncated normal, lecun uniform and glorot normal and, after observing the results, decided for the latter, that allowed the network to converge faster to smaller validation loss values. This initialization, based on the node fan_in and fan_out, is also very similar to the one I used when classifying traffic signs in project 2.
 
 To reduce overfitting I tried diffent combinations of dropout layers and drop probabilities. In the end, I decided to apply a 25% drop probability after each convolutional layer in the network, leaving out the fully connected layers.
 
@@ -133,6 +133,6 @@ To reduce the amount of preprocessed data stored in memory, I used a generator t
 
 While training the model, I noticed that it was somehow difficult to predict after what number of epochs the validation loss reached its minimum. To avoid wasting time overfitting models and the having to reduce the number of epochs to get a better results, I used the callbacks "ModelCheckpoint" to keep trace of the various trained models and "EarlyStopping" to avoid overfitting uselessly.
 
-The training and validation losses of the final models are shown as follows. The model trained in the 3rd epoch is the that has been used.
+The training and validation losses of the final models are shown as follows. The model trained in the 3rd epoch is the one that has been used to drive the car autonomously.
 
 ![nn_model](./writeup_images/model.png)
