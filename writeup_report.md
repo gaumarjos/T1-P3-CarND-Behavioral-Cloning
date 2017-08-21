@@ -1,8 +1,4 @@
-#**Behavioral Cloning** 
-
-##Writeup Template
-
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
+# **Behavioral Cloning** 
 
 ---
 
@@ -27,40 +23,45 @@ The goals / steps of this project are the following:
 [image7]: ./examples/placeholder_small.png "Flipped Image"
 
 ## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
+Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
-###Files Submitted & Code Quality
 
-####1. Submission includes all required files and can be used to run the simulator in autonomous mode
+### Files Submitted & Code Quality
+
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
-* writeup_report.md or writeup_report.pdf summarizing the results
+* writeup_report.md summarizing the results
 
-####2. Submission includes functional code
+#### 2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
 python drive.py model.h5
 ```
 
-####3. Submission code is usable and readable
+#### 3. Submission code is usable and readable
 
 The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. An appropriate model architecture has been employed
+#### 1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+The whole model is implemented in Keras. Train images are first cropped (i, so the NN can concetrate only on the road and forget about the landscape. Then, the data is normalized in the model using a Keras lambda layer.
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+The core of the model implements the architecture described by Nvidia in their [End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf) paper and shown in the following graph (also taken from the same paper):
 
-####2. Attempts to reduce overfitting in the model
+![nn_model][writeup_images/cnn-architecture-624x890.png]
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+The only difference from this model is that ELU layers are used instead f RELU to introduce nonlinearity.
+
+#### 2. Attempts to reduce overfitting in the model
+
+The model contains dropout layers in order to reduce overfitting.
 
 The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
