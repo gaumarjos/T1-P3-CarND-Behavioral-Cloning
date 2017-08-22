@@ -69,13 +69,13 @@ Before opting for the Nvidia network, I tried the LeNet architecture to see if i
 
 After observing this, I decided to switch to a more complex architecture, the one proposed by Nvidia in their [paper](https://arxiv.org/pdf/1604.07316v1.pdf)
 
-Before stepping into the details of the architecure, it's worth mentioning that, as a first step, the images are cropped (so the NN could concetrate only on the road and forget about the landscape) and the data normalized. Both activities were performed using Keras modules.
+Before stepping into the details of the architecture, it's worth mentioning that, as a first step, the images are cropped (so the NN could concetrate only on the road and forget about the landscape) and the data normalized. Both activities were performed using Keras modules.
 
 I tried different initializations methods for weights and biases, such as zeros, truncated normal, lecun uniform and glorot normal and, after observing the results, decided for the latter, that allowed the network to converge faster to smaller validation loss values. This initialization, based on the node fan_in and fan_out, is also very similar to the one I used when classifying traffic signs in project 2.
 
 To reduce overfitting I tried diffent combinations of dropout layers and drop probabilities. In the end, I decided to apply a 25% drop probability after each convolutional layer in the network, leaving out the fully connected layers.
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 As already mentioned, the architecture proposed by Nvidia in their [paper](https://arxiv.org/pdf/1604.07316v1.pdf) was used.
 
@@ -121,11 +121,21 @@ Here is a scheme of the architecture:
 | Fully connected		    | outputs 1              						            |
 | ELU 					        |												                        |
 
-####3. Creation of the Training Set & Training Process
+#### 3. Creation of the Training Set & Training Process
 
 After recording the data by driving at the center of the road, I augmented the obtained dataset by:
 * Using the images recorded by the side cameras, using a correction angle of 0.4. The choice is the result of a compromise between a good reaction when the car was getting closer to the side of the road (higher numbers) and a smooth driving (smaller numbers). In total the number of images 
 * Flipping the images (and changing sign to the steering angle obviously) with a 50% probability.
+
+Here is an histogram showing the distribution of labels in the training datases over steering angles before (left) and after (right) using side images and flipping. A logarithmic scale was chosen for the vertical axis to make the less-represented labes visible.
+
+![nocrop](./writeup_images/distr_train_noflip_no3_log.png)          ![crop](./writeup_images/distr_train_log.png)
+
+Following that, images were also cropped 65px above and 20 below, so the NN could concentrate on the road without getting confused by the surroundings, and normalized. Here is an example of two images, one center and one left, after cropping:
+
+![nocrop](./writeup_images/nocrop.jpg)          ![crop](./writeup_images/crop.jpg)
+![nocropleft](./writeup_images/nocropleft.jpg)  ![cropleft](./writeup_images/cropleft.jpg)
+
 
 By doing so, I had a total of 50367 images, of which 40290 (80%) ended up in the training set and the remaining in the validation set.
 
